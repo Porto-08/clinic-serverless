@@ -1,0 +1,50 @@
+org: porto06
+app: patients-api
+service: patients-api
+frameworkVersion: "3"
+
+params:
+  default:
+    patientsTableName: patients
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-east-1
+  environment:
+    PATIENTS_TABLE: ${param:patientsTableName}
+
+functions:
+  getPatients:
+    handler: functions/getPatients.handler
+    events:
+      - httpApi:
+          path: /patients
+          method: get
+  getPatient:
+    handler: functions/getPatient.handler
+    events:
+      - httpApi:
+          path: /patients/{id}
+          method: get
+
+resources:
+  Resources:
+    PatientsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: patients
+        AttributeDefinitions:
+          - AttributeName: patients_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: patients_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline

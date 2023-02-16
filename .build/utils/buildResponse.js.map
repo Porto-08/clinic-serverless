@@ -1,0 +1,1 @@
+{"version":3,"file":"buildResponse.js","sourceRoot":"","sources":["../../utils/buildResponse.ts"],"names":[],"mappings":";;;AAEO,IAAM,aAAa,GAAG,UAC3B,UAAkB,EAClB,IAAS;IAET,OAAO;QACL,UAAU,YAAA;QACV,IAAI,EAAE,IAAI,CAAC,SAAS,CAAC,IAAI,EAAE,IAAI,EAAE,CAAC,CAAC;KACpC,CAAC;AACJ,CAAC,CAAC;AARW,QAAA,aAAa,iBAQxB"}
