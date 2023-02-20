@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { buildResponse } from "../utils/buildResponse";
+import { buildResponse } from "../../utils/buildResponse";
 import { DynamoDB } from "aws-sdk";
 
 const dynamoDb = new DynamoDB.DocumentClient();
@@ -14,7 +14,9 @@ export const handler = async (
     const patient = await dynamoDb
       .get({
         TableName: tableName,
-        Key: { id },
+        Key: {
+          patients_id: id,
+        },
       })
       .promise();
 

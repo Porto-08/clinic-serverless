@@ -6,6 +6,7 @@ frameworkVersion: "3"
 params:
   default:
     patientsTableName: patients
+    scheduleTableName: schedules
 
 provider:
   name: aws
@@ -14,19 +15,56 @@ provider:
   region: us-east-1
   environment:
     PATIENTS_TABLE: ${param:patientsTableName}
+    SCHEDULES_TABLE: ${param:scheduleTableName}
+  timeout: 10
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.PATIENTS_TABLE}"
 
 functions:
   getPatients:
-    handler: functions/getPatients.handler
+    handler: lambda/patients/getPatients.handler
     events:
       - httpApi:
           path: /patients
           method: get
   getPatient:
-    handler: functions/getPatient.handler
+    handler: lambda/patients/getPatient.handler
     events:
       - httpApi:
           path: /patients/{id}
+          method: get
+  createPatient:
+    handler: lambda/patients/createPatient.handler
+    events:
+      - httpApi:
+          path: /patients/create
+          method: post
+  updatePatient:
+    handler: lambda/patients/updatePatient.handler
+    events:
+      - httpApi:
+          path: /patients/update/{id}
+          method: put
+  createSchedule:
+    handler: lambda/schedules/createSchedule.handler
+    events:
+      - httpApi:
+          path: /schedules/create
+          method: post
+  getSchedulesById:
+    handler: lambda/schedules/getSchedulesById.handler
+    events:
+      - httpApi:
+          path: /schedules/patient/{id}
           method: get
 
 resources:
@@ -40,6 +78,19 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: patients_id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    SchedulesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: schedules
+        AttributeDefinitions:
+          - AttributeName: schedules_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: schedules_id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
